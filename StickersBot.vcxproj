@@ -1,0 +1,214 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>18.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{092a5340-dd3f-4aea-b341-0e35d063f975}</ProjectGuid>
+    <RootNamespace>StickersBot</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v145</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v145</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v145</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v145</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Manifest>
+      <EnableSegmentHeap>true</EnableSegmentHeap>
+    </Manifest>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Manifest>
+      <EnableSegmentHeap>true</EnableSegmentHeap>
+    </Manifest>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>C:\Users\belou\source\repos\StickersBot\StickersBot\include\BotApp\Handlers;C:\Users\belou\source\repos\StickersBot\StickersBot\include\Telegram;C:\Users\belou\source\repos\StickersBot\StickersBot\include\BotApp\Context;C:\Users\belou\source\repos\StickersBot\StickersBot\include\BotApp\UI;C:\Users\belou\source\repos\StickersBot\StickersBot\include\Storage;C:\Users\belou\source\repos\StickersBot\StickersBot\include\Models;C:\Users\belou\source\repos\StickersBot\StickersBot\include\Managers;C:\Users\belou\source\repos\StickersBot\StickersBot\include\Database;C:\Users\belou\source\repos\StickersBot\StickersBot\include\Core;C:\Users\belou\source\repos\StickersBot\StickersBot\include\BotApp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Manifest>
+      <EnableSegmentHeap>true</EnableSegmentHeap>
+    </Manifest>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>C:\Users\belou\source\repos\StickersBot\StickersBot\include\Telegram;C:\Users\belou\source\repos\StickersBot\StickersBot\include\Storage;C:\Users\belou\source\repos\StickersBot\StickersBot\include\Models;C:\Users\belou\source\repos\StickersBot\StickersBot\include\Managers;C:\Users\belou\source\repos\StickersBot\StickersBot\include\Database;C:\Users\belou\source\repos\StickersBot\StickersBot\include\Core;C:\Users\belou\source\repos\StickersBot\StickersBot\include\BotApp;C:\Users\belou\source\repos\StickersBot\StickersBot\include\BotApp\UI;C:\Users\belou\source\repos\StickersBot\StickersBot\include\BotApp\Handlers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Manifest>
+      <EnableSegmentHeap>true</EnableSegmentHeap>
+    </Manifest>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="src\BotApp\Bot.cpp" />
+    <ClCompile Include="src\BotApp\Handlers\CallbackHandlers.cpp" />
+    <ClCompile Include="src\BotApp\Handlers\TextHandlers.cpp" />
+    <ClCompile Include="src\BotApp\ThreadPool.cpp" />
+    <ClCompile Include="src\BotApp\UI\AdministratorUI.cpp" />
+    <ClCompile Include="src\BotApp\UI\ApplicationUI.cpp" />
+    <ClCompile Include="src\BotApp\UI\ModeratorUI.cpp" />
+    <ClCompile Include="src\BotApp\UI\UserUI.cpp" />
+    <ClCompile Include="src\Core\Config.cpp" />
+    <ClCompile Include="src\Core\Core.cpp" />
+    <ClCompile Include="src\Database\Database.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Managers\AdvertisementManager.cpp" />
+    <ClCompile Include="src\Managers\ApplicationManager.cpp" />
+    <ClCompile Include="src\Managers\CategoryManager.cpp" />
+    <ClCompile Include="src\Managers\StickerDatabase.cpp" />
+    <ClCompile Include="src\Managers\StickerPackManager.cpp" />
+    <ClCompile Include="src\Managers\Users.cpp" />
+    <ClCompile Include="src\Models\Advertisement.cpp" />
+    <ClCompile Include="src\Models\InputState.cpp" />
+    <ClCompile Include="src\Models\StickerApplication.cpp" />
+    <ClCompile Include="src\Models\StickerPack.cpp" />
+    <ClCompile Include="src\Models\StickerRatings.cpp" />
+    <ClCompile Include="src\Models\User.cpp" />
+    <ClCompile Include="src\Models\UserInfo.cpp" />
+    <ClCompile Include="src\Storage\FileStorage.cpp" />
+    <ClCompile Include="src\Telegram\TelegramApi.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Data\Config.ini" />
+    <None Include="Data\Storage\Stickers.json" />
+    <None Include="Data\Storage\Users.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\BotApp\Bot.h" />
+    <ClInclude Include="include\BotApp\Handlers\CallbackHandlers.h" />
+    <ClInclude Include="include\BotApp\Handlers\Context.h" />
+    <ClInclude Include="include\BotApp\Handlers\TextHandlers.h" />
+    <ClInclude Include="include\BotApp\ThreadPool.h" />
+    <ClInclude Include="include\BotApp\UI\AdministratorUI.h" />
+    <ClInclude Include="include\BotApp\UI\ApplicationUI.h" />
+    <ClInclude Include="include\BotApp\UI\MessageText.h" />
+    <ClInclude Include="include\BotApp\UI\ModeratorUI.h" />
+    <ClInclude Include="include\BotApp\UI\UI.h" />
+    <ClInclude Include="include\BotApp\UI\UserUI.h" />
+    <ClInclude Include="include\Core\Config.h" />
+    <ClInclude Include="include\Core\Core.h" />
+    <ClInclude Include="include\Database\Database.h" />
+    <ClInclude Include="include\Managers\AdvertisementManager.h" />
+    <ClInclude Include="include\Managers\ApplicationManager.h" />
+    <ClInclude Include="include\Managers\CategoryManager.h" />
+    <ClInclude Include="include\Managers\StickerDatabase.h" />
+    <ClInclude Include="include\Managers\StickerPackManager.h" />
+    <ClInclude Include="include\Managers\Users.h" />
+    <ClInclude Include="include\Models\Advertisement.h" />
+    <ClInclude Include="include\Models\InputState.h" />
+    <ClInclude Include="include\Models\StickerApplication.h" />
+    <ClInclude Include="include\Models\StickerPack.h" />
+    <ClInclude Include="include\Models\StickerRatings.h" />
+    <ClInclude Include="include\Models\User.h" />
+    <ClInclude Include="include\Models\UserInfo.h" />
+    <ClInclude Include="include\Storage\FileStorage.h" />
+    <ClInclude Include="include\Telegram\TelegramApi.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Data\Error.log" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

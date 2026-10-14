@@ -1,0 +1,2 @@
+2026-10-14 15:35:17.4040206: Ошибка при чтении файла пользователей: [json.exception.parse_error.101] parse error at line 1, column 1: attempting to parse an empty input; check that your input string or stream contains the expected JSON
+2026-10-14 15:35:18.0140363: Ошибка при чтении файла стикеров: [json.exception.parse_error.101] parse error at line 1, column 1: attempting to parse an empty input; check that your input string or stream contains the expected JSON

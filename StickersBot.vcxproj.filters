@@ -1,0 +1,262 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\Core">
+      <UniqueIdentifier>{b32b2086-f617-44d8-80cb-bff5bdf1597e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Core">
+      <UniqueIdentifier>{38aee469-fcd6-4016-80fd-07f33e7519d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\BotApp">
+      <UniqueIdentifier>{475eafa4-8ad7-43e3-aa80-cc6ca07c1fe3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\BotApp">
+      <UniqueIdentifier>{70e15fbe-2fdf-4085-8ff4-5f3678ff3cbc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Database">
+      <UniqueIdentifier>{4cde6377-b743-445f-90a5-69b215dd0724}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Database">
+      <UniqueIdentifier>{5b0ed2ad-0682-471d-a669-aa5aeca5fff4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Models">
+      <UniqueIdentifier>{d91c90b1-bf06-4111-a1f5-50cf45ca60e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Models">
+      <UniqueIdentifier>{381e16bf-fa2c-4fd5-b322-8904b1c3a021}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Storage">
+      <UniqueIdentifier>{6f82d950-81bf-4b7c-808e-d77f841b915b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Storage">
+      <UniqueIdentifier>{a8e95258-2990-4b1f-9494-9d0709e7714b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Managers">
+      <UniqueIdentifier>{bb1b0be3-b94f-408e-8d21-1e40e7d97037}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Managers">
+      <UniqueIdentifier>{774fd540-c162-4ebf-90ca-0235c2e16ae1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\BotApp\UI">
+      <UniqueIdentifier>{5b669a97-99e4-44eb-8ceb-e0f67acb12bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\BotApp\UI">
+      <UniqueIdentifier>{24d30cc5-b091-49cc-8140-3c1142bfd83c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Telegram">
+      <UniqueIdentifier>{399efadf-dcf7-4940-940f-bd32ebdbe161}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Telegram">
+      <UniqueIdentifier>{c050b611-0125-4118-b11c-47e6a624d502}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\BotApp\Handlers">
+      <UniqueIdentifier>{8982f6c6-6311-42a0-ad67-f0089d62fa04}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\BotApp\Handlers">
+      <UniqueIdentifier>{1e361bcf-af9d-47d4-b7d9-8d25f9f01146}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Storage">
+      <UniqueIdentifier>{3574dc57-96c1-4ebd-8e43-e78c64381539}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Config.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Core.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BotApp\Bot.cpp">
+      <Filter>Source Files\BotApp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Models\User.cpp">
+      <Filter>Source Files\Models</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BotApp\ThreadPool.cpp">
+      <Filter>Source Files\BotApp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Models\StickerPack.cpp">
+      <Filter>Source Files\Models</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Models\StickerApplication.cpp">
+      <Filter>Source Files\Models</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Models\UserInfo.cpp">
+      <Filter>Source Files\Models</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Storage\FileStorage.cpp">
+      <Filter>Source Files\Storage</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Managers\StickerDatabase.cpp">
+      <Filter>Source Files\Models</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Managers\Users.cpp">
+      <Filter>Source Files\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Managers\StickerPackManager.cpp">
+      <Filter>Source Files\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Managers\ApplicationManager.cpp">
+      <Filter>Source Files\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Managers\CategoryManager.cpp">
+      <Filter>Source Files\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BotApp\UI\UserUI.cpp">
+      <Filter>Source Files\BotApp\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Telegram\TelegramApi.cpp">
+      <Filter>Source Files\Telegram</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BotApp\Handlers\TextHandlers.cpp">
+      <Filter>Source Files\BotApp\Handlers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BotApp\Handlers\CallbackHandlers.cpp">
+      <Filter>Source Files\BotApp\Handlers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Database\Database.cpp">
+      <Filter>Source Files\Database</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Models\StickerRatings.cpp">
+      <Filter>Source Files\Models</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BotApp\UI\AdministratorUI.cpp">
+      <Filter>Source Files\BotApp\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BotApp\UI\ModeratorUI.cpp">
+      <Filter>Source Files\BotApp\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Models\Advertisement.cpp">
+      <Filter>Source Files\Models</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Models\InputState.cpp">
+      <Filter>Source Files\Models</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BotApp\UI\ApplicationUI.cpp">
+      <Filter>Source Files\BotApp\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Managers\AdvertisementManager.cpp">
+      <Filter>Source Files\Managers</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Data\Config.ini">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Data\Storage\Stickers.json">
+      <Filter>Resource Files\Storage</Filter>
+    </None>
+    <None Include="Data\Storage\Users.json">
+      <Filter>Resource Files\Storage</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Core\Config.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Core.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BotApp\Bot.h">
+      <Filter>Header Files\BotApp</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Models\User.h">
+      <Filter>Header Files\Models</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BotApp\ThreadPool.h">
+      <Filter>Header Files\BotApp</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Models\InputState.h">
+      <Filter>Header Files\Models</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Models\StickerPack.h">
+      <Filter>Header Files\Models</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Models\StickerApplication.h">
+      <Filter>Header Files\Models</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Models\UserInfo.h">
+      <Filter>Header Files\Models</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Storage\FileStorage.h">
+      <Filter>Header Files\Storage</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Managers\Users.h">
+      <Filter>Header Files\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Managers\StickerPackManager.h">
+      <Filter>Header Files\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Managers\CategoryManager.h">
+      <Filter>Header Files\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Managers\ApplicationManager.h">
+      <Filter>Header Files\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Managers\StickerDatabase.h">
+      <Filter>Header Files\Models</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BotApp\UI\UserUI.h">
+      <Filter>Header Files\BotApp\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Telegram\TelegramApi.h">
+      <Filter>Header Files\Telegram</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BotApp\UI\MessageText.h">
+      <Filter>Header Files\BotApp\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BotApp\Handlers\CallbackHandlers.h">
+      <Filter>Header Files\BotApp\Handlers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BotApp\Handlers\TextHandlers.h">
+      <Filter>Header Files\BotApp\Handlers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BotApp\Handlers\Context.h">
+      <Filter>Header Files\BotApp\Handlers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Database\Database.h">
+      <Filter>Header Files\Database</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Models\StickerRatings.h">
+      <Filter>Header Files\Models</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BotApp\UI\AdministratorUI.h">
+      <Filter>Header Files\BotApp\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BotApp\UI\ModeratorUI.h">
+      <Filter>Header Files\BotApp\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Models\Advertisement.h">
+      <Filter>Header Files\Models</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BotApp\UI\ApplicationUI.h">
+      <Filter>Header Files\BotApp\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BotApp\UI\UI.h">
+      <Filter>Header Files\BotApp\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Managers\AdvertisementManager.h">
+      <Filter>Header Files\Managers</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Data\Error.log">
+      <Filter>Resource Files</Filter>
+    </Text>
+  </ItemGroup>
+</Project>
