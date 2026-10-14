@@ -1,4 +1,7 @@
 #include <iostream>
+#include <cstdlib>
+#include <clocale>
+
 #include "Config.h"
 #include "Core.h"
 #include "Bot.h"
