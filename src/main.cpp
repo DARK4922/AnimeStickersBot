@@ -10,7 +10,7 @@
 	#include <Windows.h>
 #endif
 
-int main()
+int main(int argc, char* argv[])
 {
 	// Изменение локали консоли
 #ifdef _WIN32

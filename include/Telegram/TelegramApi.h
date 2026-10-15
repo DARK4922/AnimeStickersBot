@@ -134,36 +134,48 @@ public:
 	// Отправка сообщения
 	bool sendMessage(
 		const Message& message,
-		const SendMessageOptions& options = {}
+		const SendMessageOptions& options =
+			SendMessageOptions{
+				MessageOptions{ std::nullopt, "HTML" },
+				std::nullopt
+		}
 	);
 
 	// Отправка фото
 	bool sendPhoto(
 		const Message& message,
 		const std::string& photo,
-		const MessageOptions& options = {}
+		const MessageOptions& options =
+			MessageOptions{ std::nullopt, "HTML" }
 	);
 	bool sendPhotoId(
 		const Message& message,
 		const std::string& photo,
-		const MessageOptions& options = {}
+		const MessageOptions& options =
+			MessageOptions{ std::nullopt, "HTML" }
 	);
 
 	// Отправка сообщений с проверкой на блокировку
 	bool sendMessageWithBlockCheck(
 		const Message& message,
-		const SendMessageOptions& options = {}
+		const SendMessageOptions& options =
+			SendMessageOptions{
+				MessageOptions{ std::nullopt, "HTML" },
+				std::nullopt
+		}
 	);
 	bool sendPhotoIdWithBlockCheck(
 		const Message& message,
 		const std::string& photo,
-		const MessageOptions& options = {}
+		const MessageOptions& options =
+			MessageOptions{ std::nullopt, "HTML" }
 	);
 
 	// Отправка рандомного фото
 	bool sendRandomPhoto(
 		const Message& message,
-		const MessageOptions& options = {}
+		const MessageOptions& options =
+			MessageOptions{ std::nullopt, "HTML" }
 	);
 
 	// Отправка стикера
@@ -183,7 +195,8 @@ public:
 	bool editMessage(
 		const Message& message,
 		int64_t messageId,
-		const EditMessageOptions& options = {}
+		const EditMessageOptions& options =
+			EditMessageOptions{ std::nullopt, std::nullopt, "HTML" }
 	);
 
 	// Удаление сообщения
