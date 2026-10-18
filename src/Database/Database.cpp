@@ -53,7 +53,7 @@ void Database::createStructure()
         transaction.exec(
             "CREATE TABLE IF NOT EXISTS names ("
             "id INTEGER PRIMARY KEY,"
-            "name VARCHAR(100) NOT NULL UNIQUE"
+            "name VARCHAR(200) NOT NULL UNIQUE"
             ");"
         );
 
@@ -61,11 +61,11 @@ void Database::createStructure()
         transaction.exec(
             "CREATE TABLE IF NOT EXISTS stickers ("
             "id INTEGER PRIMARY KEY,"
-            "link VARCHAR(100) NOT NULL UNIQUE,"
-            "anime_title VARCHAR(100) NOT NULL,"
+            "link VARCHAR(250) NOT NULL UNIQUE,"
+            "anime_title VARCHAR(200) NOT NULL,"
             "date_added TIMESTAMP NOT NULL,"
             "creator_id BIGINT,"
-            "creator_username VARCHAR(50) NOT NULL,"
+            "creator_username VARCHAR(100) NOT NULL,"
             "like_count INTEGER NOT NULL DEFAULT 0,"
             "dislike_count INTEGER NOT NULL DEFAULT 0,"
             "FOREIGN KEY (creator_id) "
