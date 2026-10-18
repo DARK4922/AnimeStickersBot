@@ -455,8 +455,8 @@ void AdministratorUI::advancedStatistics(
 				MessageText::Administrator::advancedStatistics(
 					Core::getDate(),
 					users_.size(),
-					stickers_.stickers().numberSections(),
 					stickers_.stickers().numberStickers(),
+					stickers_.stickers().numberSections(),
 					applicationsSize
 				)
 			},

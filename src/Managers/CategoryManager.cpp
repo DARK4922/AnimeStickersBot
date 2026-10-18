@@ -1,18 +1,24 @@
 #include "CategoryManager.h"
+
 #include <algorithm>
-#include "Core.h"
 #include <locale>
+#include <mutex>
+
+#include "Core.h"
 
 void CategoryManager::addCategory(std::string category)
 {
 	std::unique_lock<std::shared_mutex> lock(categoriesMutex_);
 
 	if (std::find(categories_.begin(), categories_.end(), category)
-		== categories_.end())
+		!= categories_.end())
 	{
-		categories_.push_back(std::move(category));
+		Core::logError("Попытка добавить существующую категорию");
+		return;
 	}
-	else { Core::logError("Попытка добавить существующую категорию"); }
+	
+	categories_.push_back(std::move(category));
+	sortCategory();
 }
 
 bool CategoryManager::exists(const std::string& category) const
@@ -24,14 +30,22 @@ bool CategoryManager::exists(const std::string& category) const
 
 void CategoryManager::sortCategory()
 {
-	// Функция сравнения для русских строк
-	auto russian_compare = [](const std::string& a, const std::string& b)
+	static const std::locale russianLocale("ru_RU.UTF-8");
+
+	const auto& collate =
+		std::use_facet<std::collate<char>>(russianLocale);
+
+	auto russianCompare = [&collate](
+		const std::string& a,
+		const std::string& b)
 		{
-			return std::use_facet<std::collate<char>>(std::locale("ru_RU.UTF-8"))
-				.compare(&a[0], &a[0] + a.size(), &b[0], &b[0] + b.size()) < 0;
+			return collate.compare(
+				a.data(), a.data() + a.size(),
+				b.data(), b.data() + b.size()
+			) < 0;
 		};
 
-	std::sort(categories_.begin(), categories_.end(), russian_compare);
+	std::sort(categories_.begin(), categories_.end(), russianCompare);
 }
 
 std::vector<std::string> CategoryManager::categories() const

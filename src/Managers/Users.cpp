@@ -1,5 +1,7 @@
 #include "Users.h"
 
+#include <mutex>
+
 void Users::addUser(int64_t id)
 {
 	std::unique_lock<std::shared_mutex> lock(usersMutex_);

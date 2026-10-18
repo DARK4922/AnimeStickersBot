@@ -296,13 +296,13 @@ void TextHandlers::handleUserInput(
 	// Ввод ссылки
 	else if (state.enteringLink)
 	{
-		ctx.users.withUser(chatId, [](User& user)
-			{
-				user.state<InputState::UserState>().enteringLink = false;
-			});
-
 		addStickerLink([&ctx](int64_t chatId)
 			{
+				ctx.users.withUser(chatId, [](User& user)
+					{
+						user.state<InputState::UserState>().enteringLink = false;
+					});
+
 				ctx.ui.application.addStickersMenu(chatId);
 			});
 	}

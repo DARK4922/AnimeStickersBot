@@ -78,12 +78,17 @@ std::string Core::randomPhoto()
 
 int Core::randomNumber(int min, int max)
 {
-	static std::random_device rd;
-	static std::mt19937 gen(rd());
+    if (min >= max)
+    {
+        logError("Недопустимый диапазон случайных чисел");
+        return min;
+    }
 
-	std::uniform_int_distribution<int> dist(min, max);
+    thread_local std::mt19937 gen(std::random_device{}());
 
-	return dist(gen);
+    std::uniform_int_distribution<int> dist(min, max - 1);
+
+    return dist(gen);
 }
 
 const std::vector<std::string>& Core::getBackgroundStickers()
