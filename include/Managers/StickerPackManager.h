@@ -6,6 +6,9 @@
 #include <unordered_set>
 #include <shared_mutex>
 #include <optional>
+#include <cstdint>
+#include <mutex>
+#include <algorithm>
 #include "StickerPack.h"
 
 class StickerPackManager
@@ -18,7 +21,7 @@ private:
 	std::unordered_set<std::string> links_;
 	mutable std::shared_mutex linksMutex_;
 
-	int nextId_{ 1 };
+	int64_t nextId_{ 1 };
 
 public:
 	// Добавление нового стикера
@@ -30,8 +33,15 @@ public:
 		std::string creatorName = {}
 	);
 
+	// Удаление стикерпака по ID
+	bool removeSticker(int id);
+
 	// Очистка всех стикеров
 	void clearStickers();
+
+	// Счётчик ID сохраняется отдельно от оставшихся стикерпаков
+	int64_t nextId() const;
+	void ensureNextId(int64_t nextId);
 
 	// Статистика
 	size_t numberSections() const;

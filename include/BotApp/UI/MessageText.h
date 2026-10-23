@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <unordered_set>
+#include "User.h"
 
 namespace MessageText
 {
@@ -499,6 +500,114 @@ R"(🌀 <b>Ой-ой... Похоже, заявка куда-то исчезла!
 
     namespace Administrator
     {
+        inline std::string showUserSettingsMenu(const ::User& user)
+        {
+            std::string username;
+            for (const char character : user.username())
+            {
+                switch (character)
+                {
+                case '&': username += "&amp;"; break;
+                case '<': username += "&lt;"; break;
+                case '>': username += "&gt;"; break;
+                default: username += character; break;
+                }
+            }
+            if (username.empty()) { username = "Не указан"; }
+
+            std::string role;
+            switch (user.role())
+            {
+            case ::User::Role::User: role = "Пользователь"; break;
+            case ::User::Role::Moderator: role = "Модератор"; break;
+            case ::User::Role::Administrator: role = "Администратор"; break;
+            default: role = "Неизвестна"; break;
+            }
+
+            return "👤 <b>Управление ролью пользователя</b>\n\n"
+                "🆔 <b>ID:</b> <code>" + std::to_string(user.id()) + "</code>\n"
+                "👤 <b>Username:</b> " + username + "\n"
+                "🏷️ <b>Текущая роль:</b> " + role + "\n\n"
+                "Выберите роль, которую хотите назначить данному пользователю.\n\n"
+                "🔹 <b>Пользователь</b> — стандартные права доступа.\n"
+                "🛡️ <b>Модератор</b> — дополнительные права для модерации.\n"
+                "👑 <b>Администратор</b> — расширенные права управления ботом.\n\n"
+                "👇 <b>Выберите новую роль с помощью кнопок ниже.</b>";
+        }
+
+        inline std::string onUserRoleAssigned(const ::User& user)
+        {
+            std::string username{};
+            for (const char character : user.username())
+            {
+                switch (character)
+                {
+                case '&': username += "&amp;"; break;
+                case '<': username += "&lt;"; break;
+                case '>': username += "&gt;"; break;
+                default: username += character; break;
+                }
+            }
+            if (username.empty()) { username = "Не указан"; }
+
+            std::string role;
+            switch (user.role())
+            {
+            case ::User::Role::User: role = "Пользователь"; break;
+            case ::User::Role::Moderator: role = "Модератор"; break;
+            case ::User::Role::Administrator: role = "Администратор"; break;
+            default: role = "Неизвестна"; break;
+            }
+
+            return "✅ <b>Новая роль назначена!</b>\n\n"
+                "<i>Роль пользователя успешно обновлена~</i> ✨\n\n"
+                "🆔 <b>ID:</b> <code>" + std::to_string(user.id()) + "</code>\n"
+                "👤 <b>Username:</b> " + username + "\n"
+                "🏷️ <b>Новая роль:</b> " + role;
+        }
+
+        inline std::string roleAssignmentNotification(::User::Role newRole)
+        {
+            std::string role{};
+            std::string instructions{};
+            switch (newRole)
+            {
+            case ::User::Role::User:
+                role = "Пользователь";
+                instructions = "Тебе доступны обычные возможности бота: выбирай аниме, "
+                    "смотри стикеры и отправляй свои заявки. Дополнительных обязанностей нет~ 🌸";
+                break;
+            case ::User::Role::Moderator:
+                role = "Модератор";
+                instructions = "Теперь ты можешь <b>принимать и удалять заявки</b> пользователей.\n"
+                    "Проверяй присланные стикеры перед принятием заявки и помогай "
+                    "поддерживать порядок в нашей коллекции~ 🛡️";
+                break;
+            case ::User::Role::Administrator:
+                role = "Администратор";
+                instructions = "Тебе открыт <b>полный доступ к управлению ботом</b>, "
+                    "включая все возможности модератора.\n\n"
+                    "🔧 <b>Меню разработчика:</b> /developerMenu\n"
+                    "Используй его для управления ботом~ 👑";
+                break;
+            default:
+                role = "Неизвестна";
+                instructions = "Не удалось определить возможности этой роли. "
+                    "Пожалуйста, обратись к администратору.";
+                break;
+            }
+
+            return "✨ <b>Тебе назначена новая роль!</b>\n\n"
+                "🏷️ <b>Твоя роль:</b> " + role + "\n\n"
+                "📋 <b>Что это значит?</b>\n" + instructions;
+        }
+
+        inline std::string userWasNotFound(int64_t userId)
+        {
+            return "❌ <b>Пользователь не найден.</b>\nID: <code>"
+                + std::to_string(userId) + "</code>";
+        }
+
 		inline std::string advancedStatistics(
             std::string time,
 			size_t users,
@@ -548,6 +657,18 @@ R"(🌀 <b>Ой-ой... Похоже, заявка куда-то исчезла!
 
         inline std::string confirmationAction(const std::string& action)
         {
+            const auto separatorPos{ action.find('#') };
+            const std::string name{ action.substr(0, separatorPos) };
+            if (separatorPos != std::string::npos
+                && (name == "make_a_user" || name == "make_a_moderator"
+                    || name == "make_an_administrator"))
+            {
+                const std::string role{ name == "make_a_user" ? "Пользователь"
+                    : name == "make_a_moderator" ? "Модератор" : "Администратор" };
+                return "⚠️ <b>Подтверждение изменения роли</b>\n\n"
+                    "Назначить пользователю с ID <code>" + action.substr(separatorPos + 1)
+                    + "</code> роль <b>" + role + "</b>?";
+            }
             std::string text =
                 "<b>⚠️ Внимание!</b>\nВы действительно уверены, что хотите <i>" + action + "</i> 👇";
             return text;
@@ -610,10 +731,31 @@ R"(✔ Рассылка началась)";
 
         static const std::string sendAdvertisementToAllUsers =
             R"(<b>Рассылка рекламы начинается</b>)";
+
+        static const std::string showAdminManagementMenu =
+            R"(👤 <b>Выбор пользователя</b>
+
+Пожалуйста, отправьте <b>Telegram ID пользователя</b>, над которым вы хотите выполнить операции.
+
+🔎 <b>Пример:</b> `123456789`
+
+После ввода ID откроется меню доступных действий для выбранного пользователя.)";
     }
 
     namespace Moderator
     {
+        static const std::string confirmStickerRemoval =
+R"(⚠️ <b>Удаление стикерпака</b>
+
+Ты действительно хочешь удалить этот стикерпак из коллекции бота?
+
+<i>Подтверди удаление или нажми «Отмена», чтобы оставить стикерпак в коллекции.</i>)";
+
+        static const std::string stickerRemoved =
+R"(🗑️ <b>Стикерпак удалён</b>
+
+<i>Этот стикерпак больше не доступен в коллекции бота~</i>)";
+
         inline std::string getApplication(
             int64_t id,
             const std::string& name,

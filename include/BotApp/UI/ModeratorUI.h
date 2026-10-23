@@ -23,6 +23,12 @@ public:
 		ApplicationManager& applications
 	);
 
+	// Подтверждение удаления стикерпака
+	void confirmStickerRemoval(int64_t chatId, int64_t messageId, int stickerId);
+
+	// Стикерпак удалён
+	void onStickerRemoved(int64_t chatId, int64_t messageId);
+
 	// Получение заявки
 	void getApplication(
 		int64_t chatId,

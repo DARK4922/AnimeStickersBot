@@ -26,6 +26,9 @@ public:
 	// Удаление пользователя
 	void deleteUser(int64_t id);
 
+	// Очистка оценок удалённого стикерпака
+	void removeStickerRatings(int stickerId);
+
 	// Очистка всех пользователей
 	void clearUsers();
 

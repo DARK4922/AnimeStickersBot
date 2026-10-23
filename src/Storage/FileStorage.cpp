@@ -2,6 +2,8 @@
 #include <fstream>
 #include <nlohmann/json.hpp>
 #include <iostream>
+#include <limits>
+#include <algorithm>
 #include "Core.h"
 
 FileStorage::FileStorage(
@@ -14,7 +16,7 @@ FileStorage::FileStorage(
 	, numberMargins_(numberMargins)
 {}
 
-bool FileStorage::saveStickers(const std::vector<StickerPack>& stickers) const
+bool FileStorage::saveStickers(const std::vector<StickerPack>& stickers, int64_t nextId) const
 {
 	std::ofstream file(stickersFile_);
 	if (!file.is_open())
@@ -24,7 +26,10 @@ bool FileStorage::saveStickers(const std::vector<StickerPack>& stickers) const
 		return false;
 	}
 
-	nlohmann::json j = stickers;
+	nlohmann::json j = {
+		{ "nextId", nextId },
+		{ "stickers", stickers }
+	};
 	file << j.dump(numberMargins_);
 
 	if (!file)
@@ -62,8 +67,9 @@ bool FileStorage::saveUsers(const std::vector<User>& users) const
 	return true;
 }
 
-std::vector<StickerPack> FileStorage::updateStickers() const
+std::vector<StickerPack> FileStorage::updateStickers(int64_t& nextId) const
 {
+	nextId = 0;
 	std::ifstream file(stickersFile_);
 	if (!file.is_open())
 	{
@@ -77,7 +83,22 @@ std::vector<StickerPack> FileStorage::updateStickers() const
 		nlohmann::json data;
 		file >> data;
 
-		return data.get<std::vector<StickerPack>>();
+		// Старые файлы содержат только массив стикерпаков.
+		const auto stickers{ (data.is_array() ? data : data.at("stickers"))
+			.get<std::vector<StickerPack>>() };
+		int64_t savedNextId{ data.is_array() ? 1 : data.at("nextId").get<int64_t>() };
+		if (savedNextId < 1
+			|| savedNextId > static_cast<int64_t>(std::numeric_limits<int>::max()) + 1)
+		{
+			Core::logError("Некорректный счётчик ID стикерпаков в файле");
+			return {};
+		}
+		for (const auto& sticker : stickers)
+		{
+			savedNextId = std::max(savedNextId, static_cast<int64_t>(sticker.id()) + 1);
+		}
+		nextId = savedNextId;
+		return stickers;
 	}
 	catch (const nlohmann::json::exception& e)
 	{

@@ -2,10 +2,25 @@
 
 #include <charconv>
 #include <system_error>
+#include <exception>
+#include <utility>
 
 #include "Core.h"
 
 CallbackHandlers::CallbackHandlers(Context& ctx) : ctx_(ctx) { load(); }
+
+void CallbackHandlers::enqueue(std::function<void()> task)
+{
+    ctx_.pool.addTask([task = std::move(task)]
+    {
+        try { task(); }
+        catch (const std::exception& error)
+        {
+            Core::logError("Ошибка обработки callback: " + std::string(error.what()));
+        }
+        catch (...) { Core::logError("Неизвестная ошибка обработки callback"); }
+    });
+}
 
 void CallbackHandlers::load()
 {
@@ -182,6 +197,13 @@ void CallbackHandlers::load()
             "get_the_first_application",
             [this](int64_t chatId, int64_t messageId)
             {
+                const auto user{ ctx_.users.getUser(chatId) };
+                if (!user || user->role() < User::Role::Moderator)
+                {
+                    ctx_.ui.administrator.accessRestricted(chatId);
+                    return;
+                }
+
                 ctx_.ui.moderator.getApplication(
                     chatId,
                     ctx_.users,
@@ -193,6 +215,13 @@ void CallbackHandlers::load()
             "get_the_first_application_update",
             [this](int64_t chatId, int64_t)
             {
+                const auto user{ ctx_.users.getUser(chatId) };
+                if (!user || user->role() < User::Role::Moderator)
+                {
+                    ctx_.ui.administrator.accessRestricted(chatId);
+                    return;
+                }
+
                 ctx_.ui.moderator.getApplication(
 					chatId,
 					ctx_.users
@@ -205,6 +234,13 @@ void CallbackHandlers::load()
             "accept_the_application",
             [this](int64_t chatId, int64_t messageId)
             {
+                const auto user{ ctx_.users.getUser(chatId) };
+                if (!user || user->role() < User::Role::Moderator)
+                {
+                    ctx_.ui.administrator.accessRestricted(chatId);
+                    return;
+                }
+
                 ctx_.ui.moderator.approveApplication(
                     chatId,
                     messageId,
@@ -219,6 +255,13 @@ void CallbackHandlers::load()
             "go_back_to_the_application",
             [this](int64_t chatId, int64_t messageId)
             {
+                const auto user{ ctx_.users.getUser(chatId) };
+                if (!user || user->role() < User::Role::Moderator)
+                {
+                    ctx_.ui.administrator.accessRestricted(chatId);
+                    return;
+                }
+
                 ctx_.users.withUser(chatId, [](User& user)
                     {
                         user.state<InputState::ModeratorState>().
@@ -238,6 +281,13 @@ void CallbackHandlers::load()
             "reject_the_application",
             [this](int64_t chatId, int64_t messageId)
             {
+                const auto user{ ctx_.users.getUser(chatId) };
+                if (!user || user->role() < User::Role::Moderator)
+                {
+                    ctx_.ui.administrator.accessRestricted(chatId);
+                    return;
+                }
+
                 ctx_.ui.moderator.getRejectionReason(
                     chatId,
                     messageId,
@@ -251,6 +301,8 @@ void CallbackHandlers::load()
 			"save_menu",
 			[this](int64_t chatId, int64_t messageId)
 			{
+				if (!ctx_.ui.administrator.accessVerification(chatId)) { return; }
+
 				ctx_.ui.administrator.saveMenu(chatId, messageId);
 			}
 		},
@@ -260,6 +312,8 @@ void CallbackHandlers::load()
 			"update_menu",
 			[this](int64_t chatId, int64_t messageId)
 			{
+				if (!ctx_.ui.administrator.accessVerification(chatId)) { return; }
+
 				ctx_.ui.administrator.updateMenu(chatId, messageId);
 			}
 		},
@@ -269,6 +323,17 @@ void CallbackHandlers::load()
             "developers_menu",
             [this](int64_t chatId, int64_t messageId)
             {
+                if (!ctx_.ui.administrator.accessVerification(chatId)) { return; }
+
+                ctx_.users.withUser(chatId, [](User& user)
+                    {
+                        if (user.role() == User::Role::Administrator)
+                        {
+                            user.state<InputState::AdministratorState>().
+                                resetAdministratorInputState();
+                        }
+                    });
+
                 ctx_.ui.administrator.menu(chatId, messageId);
             }
         },
@@ -278,6 +343,8 @@ void CallbackHandlers::load()
             "save_users_to_db",
             [this](int64_t chatId, int64_t)
             {
+                if (!ctx_.ui.administrator.accessVerification(chatId)) { return; }
+
                 ctx_.ui.administrator.saveUserToDB(
                     chatId,
                     ctx_.db
@@ -288,6 +355,8 @@ void CallbackHandlers::load()
             "save_stickers_to_db",
             [this](int64_t chatId, int64_t)
             {
+                if (!ctx_.ui.administrator.accessVerification(chatId)) { return; }
+
                 ctx_.ui.administrator.saveStickersToDB(
                     chatId,
                     ctx_.db
@@ -300,6 +369,8 @@ void CallbackHandlers::load()
             "save_users_to_file",
             [this](int64_t chatId, int64_t)
             {
+                if (!ctx_.ui.administrator.accessVerification(chatId)) { return; }
+
                 ctx_.ui.administrator.saveUserToFile(chatId);
             }
         },
@@ -307,6 +378,8 @@ void CallbackHandlers::load()
             "save_stickers_to_file",
             [this](int64_t chatId, int64_t)
             {
+                if (!ctx_.ui.administrator.accessVerification(chatId)) { return; }
+
                 ctx_.ui.administrator.saveStickersToFile(chatId);
             }
         },
@@ -316,6 +389,8 @@ void CallbackHandlers::load()
             "save_all_to_database",
             [this](int64_t chatId, int64_t)
             {
+                if (!ctx_.ui.administrator.accessVerification(chatId)) { return; }
+
                 ctx_.ui.administrator.saveAllDataToDB(
                     chatId,
                     ctx_.db
@@ -326,6 +401,8 @@ void CallbackHandlers::load()
             "save_all_data_to_file",
             [this](int64_t chatId, int64_t)
             {
+                if (!ctx_.ui.administrator.accessVerification(chatId)) { return; }
+
                 ctx_.ui.administrator.saveAllDataToFile(chatId);
             }
         },
@@ -335,6 +412,8 @@ void CallbackHandlers::load()
             "update_all_data_from_the_database",
             [this](int64_t chatId, int64_t messageId)
             {
+                if (!ctx_.ui.administrator.accessVerification(chatId)) { return; }
+
                 ctx_.ui.user.messageDeletion(chatId, messageId);
 
                 ctx_.ui.administrator.updateAllDataFromDB(
@@ -347,6 +426,8 @@ void CallbackHandlers::load()
             "update_all_data_from_the_file",
             [this](int64_t chatId, int64_t messageId)
             {
+                if (!ctx_.ui.administrator.accessVerification(chatId)) { return; }
+
                 ctx_.ui.user.messageDeletion(chatId, messageId);
                 ctx_.ui.administrator.updateAllDataFromFile(chatId);
             }
@@ -357,6 +438,8 @@ void CallbackHandlers::load()
 			"update_users_from_file",
 			[this](int64_t chatId, int64_t messageId)
 			{
+				if (!ctx_.ui.administrator.accessVerification(chatId)) { return; }
+
 				ctx_.ui.user.messageDeletion(chatId, messageId);
 				ctx_.ui.administrator.updateUserFromFile(chatId);
 			}
@@ -365,10 +448,125 @@ void CallbackHandlers::load()
 			"update_stickers_from_file",
 			[this](int64_t chatId, int64_t messageId)
 			{
+				if (!ctx_.ui.administrator.accessVerification(chatId)) { return; }
+
 				ctx_.ui.user.messageDeletion(chatId, messageId);
 				ctx_.ui.administrator.updateStickersFromFile(chatId);
 			}
 		},
+
+        // Обновление данных из БД по отдельности
+        {
+            "update_users_from_db",
+            [this](int64_t chatId, int64_t messageId)
+            {
+                if (!ctx_.ui.administrator.accessVerification(chatId)) { return; }
+
+                ctx_.ui.user.messageDeletion(chatId, messageId);
+                ctx_.ui.administrator.updateUserFromDB(chatId, ctx_.db);
+            }
+        },
+        {
+            "update_stickers_from_db",
+            [this](int64_t chatId, int64_t messageId)
+            {
+                if (!ctx_.ui.administrator.accessVerification(chatId)) { return; }
+
+                ctx_.ui.user.messageDeletion(chatId, messageId);
+                ctx_.ui.administrator.updateStickersFromDB(chatId, ctx_.db);
+            }
+        },
+        {
+            "update_all_data_from_db",
+            [this](int64_t chatId, int64_t messageId)
+            {
+                if (!ctx_.ui.administrator.accessVerification(chatId)) { return; }
+
+                ctx_.ui.user.messageDeletion(chatId, messageId);
+                ctx_.ui.administrator.updateAllDataFromDB(chatId, ctx_.db);
+            }
+        },
+
+        // Подтверждение обновления данных из файла
+        {
+            "confirm:update_users_from_file",
+            [this](int64_t chatId, int64_t messageId)
+            {
+                ctx_.ui.administrator.confirmationAction(
+                    chatId,
+                    "update_users_from_file",
+                    messageId
+                );
+            }
+        },
+        {
+            "confirm:update_stickers_from_file",
+            [this](int64_t chatId, int64_t messageId)
+            {
+                ctx_.ui.administrator.confirmationAction(
+                    chatId,
+                    "update_stickers_from_file",
+                    messageId
+                );
+            }
+        },
+        {
+            "confirm:update_all_data_from_the_file",
+            [this](int64_t chatId, int64_t messageId)
+            {
+                ctx_.ui.administrator.confirmationAction(
+                    chatId,
+                    "update_all_data_from_the_file",
+                    messageId
+                );
+            }
+        },
+
+        // Подтверждение обновления данных из БД
+        {
+            "confirm:update_users_from_db",
+            [this](int64_t chatId, int64_t messageId)
+            {
+                ctx_.ui.administrator.confirmationAction(
+                    chatId,
+                    "update_users_from_db",
+                    messageId
+                );
+            }
+        },
+        {
+            "confirm:update_stickers_from_db",
+            [this](int64_t chatId, int64_t messageId)
+            {
+                ctx_.ui.administrator.confirmationAction(
+                    chatId,
+                    "update_stickers_from_db",
+                    messageId
+                );
+            }
+        },
+        {
+            "confirm:update_all_data_from_db",
+            [this](int64_t chatId, int64_t messageId)
+            {
+                ctx_.ui.administrator.confirmationAction(
+                    chatId,
+                    "update_all_data_from_db",
+                    messageId
+                );
+            }
+        },
+        {
+            "confirm:update_all_data_from_the_database",
+            [this](int64_t chatId, int64_t messageId)
+            {
+                ctx_.ui.administrator.confirmationAction(
+                    chatId,
+                    "update_all_data_from_the_database",
+                    messageId
+                );
+            }
+        },
 
         // Отмена действия
         {
@@ -385,6 +583,8 @@ void CallbackHandlers::load()
             "number_of_users",
 			[this](int64_t chatId, int64_t)
 			{
+				if (!ctx_.ui.administrator.accessVerification(chatId)) { return; }
+
 				ctx_.ui.administrator.numberOfUsers(chatId);
 			}
         },
@@ -392,6 +592,8 @@ void CallbackHandlers::load()
 			"advanced_statistics",
             [this](int64_t chatId, int64_t messageId)
             {
+                if (!ctx_.ui.administrator.accessVerification(chatId)) { return; }
+
 				ctx_.ui.administrator.advancedStatistics(
 					chatId,
 					ctx_.applicationManager.numberApplications(),
@@ -405,6 +607,13 @@ void CallbackHandlers::load()
 			"list_of_applications",
 			[this](int64_t chatId, int64_t)
 			{
+				const auto user{ ctx_.users.getUser(chatId) };
+				if (!user || user->role() < User::Role::Moderator)
+				{
+					ctx_.ui.administrator.accessRestricted(chatId);
+					return;
+				}
+
                 ctx_.ui.moderator.getApplication
                 (chatId, ctx_.users);
 			}
@@ -434,6 +643,8 @@ void CallbackHandlers::load()
             "publish_an_advertisement",
 			[this](int64_t chatId, int64_t messageId)
 			{
+				if (!ctx_.ui.administrator.accessVerification(chatId)) { return; }
+
 				ctx_.ui.administrator.advertisingMenu(chatId, messageId);
 			}
         },
@@ -443,6 +654,8 @@ void CallbackHandlers::load()
             "add_advertising_text",
 			[this](int64_t chatId, int64_t messageId)
 			{
+				if (!ctx_.ui.administrator.accessVerification(chatId)) { return; }
+
 				ctx_.ui.administrator.getAdvertisingMessage(chatId, messageId);
 			}
         },
@@ -451,6 +664,8 @@ void CallbackHandlers::load()
             "add_advertising_photo",
             [this](int64_t chatId, int64_t messageId)
             {
+                if (!ctx_.ui.administrator.accessVerification(chatId)) { return; }
+
                 ctx_.ui.administrator.receiveAdvertisingPhoto(chatId, messageId);
             }
         },
@@ -460,6 +675,8 @@ void CallbackHandlers::load()
             "canceling_the_advertising_mailing",
 			[this](int64_t chatId, int64_t messageId)
 			{
+				if (!ctx_.ui.administrator.accessVerification(chatId)) { return; }
+
 				ctx_.ui.administrator.deleteAdvertisingPost(chatId, messageId);
 			}
         },
@@ -469,6 +686,8 @@ void CallbackHandlers::load()
             "post_preview",
             [this](int64_t chatId, int64_t)
             {
+                if (!ctx_.ui.administrator.accessVerification(chatId)) { return; }
+
                 ctx_.ui.administrator.postPreview(chatId);
             }
         },
@@ -478,6 +697,8 @@ void CallbackHandlers::load()
             "send_advertising_mailing",
             [this](int64_t chatId, int64_t messageId)
             {
+                if (!ctx_.ui.administrator.accessVerification(chatId)) { return; }
+
                 ctx_.ui.administrator.confirmAdvertisement(chatId, messageId);
             }
         },
@@ -487,7 +708,21 @@ void CallbackHandlers::load()
             "sending_ads",
             [this](int64_t chatId, int64_t messageId)
             {
+                if (!ctx_.ui.administrator.accessVerification(chatId)) { return; }
+
                 ctx_.ui.administrator.sendAdvertisementToAllUsers(chatId, messageId);
+            }
+        },
+
+        // Меню администраторов
+        {
+            "administrators_menu",
+            [this](int64_t chatId, int64_t messageId)
+            {
+                if (!ctx_.ui.administrator.accessVerification(chatId)) { return; }
+
+                ctx_.ui.administrator.showAdminManagementMenu
+                (chatId, messageId);
             }
         }
     };
@@ -498,6 +733,7 @@ void CallbackHandlers::handle(
     int64_t messageId,
     const std::string& callbackData)
 {
+    if (callbackData.empty() || callbackData.size() > 64 || messageId <= 0) { return; }
     // Проверка существует ли таколь пользователь
     if (!ctx_.users.doesUserExist(chatId))
     {
@@ -507,19 +743,26 @@ void CallbackHandlers::handle(
     auto it{ handlers_.find(callbackData) };
     if (it != handlers_.end())
     {
-        ctx_.pool.addTask(
+        enqueue(
             [it = it->second, chatId, messageId]
             {
                 it(chatId, messageId);
             });
     }
-    else
+    else if (callbackData.find(Core::separationMarker()) != std::string::npos
+        || callbackData.starts_with("Like:")
+        || callbackData.starts_with("Dislike:")
+        || callbackData.starts_with("more_stickers:"))
     {
         handleExternalCallback(
             chatId,
             messageId,
             callbackData
         );
+    }
+    else
+    {
+        Core::logError("Неизвестный callback-запрос: " + callbackData);
     }
 }
 
@@ -529,20 +772,143 @@ void CallbackHandlers::handleExternalCallback(
     const std::string& callbackData
 )
 {
-    if (callbackData.starts_with("confirm:"))
-    {
-		std::string action{ callbackData.substr(8) };
+    const std::string& marker{ Core::separationMarker() };
+    const auto separatorPos{ callbackData.find(marker) };
+    const std::string actionName{ callbackData.substr(0, separatorPos) };
 
-		ctx_.pool.addTask(
-			[this, chatId, action]
-			{
+    if (actionName == "confirm:remove_the_sticker_pack"
+        || actionName == "remove_the_sticker_pack")
+    {
+        if (separatorPos == std::string::npos) { return; }
+
+        const std::string_view idString{
+            callbackData.data() + separatorPos + marker.size(),
+            callbackData.size() - separatorPos - marker.size()
+        };
+        int stickerId{};
+        const auto [ptr, ec]{ std::from_chars(
+            idString.data(), idString.data() + idString.size(), stickerId) };
+
+        if (ec != std::errc{} || ptr != idString.data() + idString.size()
+            || stickerId <= 0)
+        {
+            Core::logError("Некорректный ID стикерпака при удалении");
+            return;
+        }
+
+        enqueue([this, chatId, messageId, stickerId, actionName]
+        {
+            const auto user{ ctx_.users.getUser(chatId) };
+            if (!user || user->role() < User::Role::Moderator)
+            {
+                ctx_.ui.administrator.accessRestricted(chatId);
+                return;
+            }
+
+            if (actionName == "remove_the_sticker_pack")
+            {
+                // Повторное подтверждение уже удалённого пака безопасно.
+                ctx_.stickerDatabase.removeSticker(stickerId, ctx_.users);
+                ctx_.ui.moderator.onStickerRemoved(chatId, messageId);
+                return;
+            }
+
+            const auto sticker{ ctx_.stickerDatabase.stickers().getSticker(stickerId) };
+            if (!sticker)
+            {
+                ctx_.ui.moderator.onStickerRemoved(chatId, messageId);
+                return;
+            }
+
+            ctx_.ui.moderator.confirmStickerRemoval(chatId, messageId, stickerId);
+        });
+    }
+
+    else if (actionName == "make_a_user"
+        || actionName == "make_a_moderator"
+        || actionName == "make_an_administrator")
+    {
+        if (separatorPos == std::string::npos) { return; }
+
+        const std::string_view idString{
+            callbackData.data() + separatorPos + marker.size(),
+            callbackData.size() - separatorPos - marker.size()
+        };
+
+        int64_t userId{};
+        const auto [ptr, ec] = std::from_chars(
+            idString.data(), idString.data() + idString.size(), userId);
+
+        if (ec != std::errc{}
+            || ptr != idString.data() + idString.size()
+            || userId <= 0)
+        {
+            Core::logError("Некорректный ID пользователя в callback");
+            return;
+        }
+
+        const User::Role role{
+            actionName == "make_a_user" ? User::Role::User
+            : actionName == "make_a_moderator" ? User::Role::Moderator
+            : User::Role::Administrator
+        };
+
+        enqueue([this, chatId, userId, role, messageId]
+        {
+            if (!ctx_.ui.administrator.accessVerification(chatId)) { return; }
+
+            if (!ctx_.users.doesUserExist(userId))
+            {
+                ctx_.ui.administrator.showUserSettingsMenu(chatId, userId);
+                return;
+            }
+
+            ctx_.users.withUser(userId, [role](User& user) { user.setRole(role); });
+
+            const auto actor{ ctx_.users.getUser(chatId) };
+            if (actor && actor->role() == User::Role::Administrator)
+            {
+                ctx_.ui.administrator.onUserRoleAssigned(chatId, messageId, userId);
+            }
+            else
+            {
+                ctx_.ui.user.messageDeletion(chatId, messageId);
+                ctx_.ui.user.menu(chatId);
+            }
+        });
+    }
+
+    // Подтверждения
+    else if (actionName == "confirm:make_a_user"
+        || actionName == "confirm:make_a_moderator"
+        || actionName == "confirm:make_an_administrator")
+    {
+        if (separatorPos == std::string::npos) { return; }
+
+        const std::string_view id{
+            callbackData.data() + separatorPos + marker.size(),
+            callbackData.size() - separatorPos - marker.size()
+        };
+        int64_t userId{};
+        const auto [ptr, ec]{ std::from_chars(id.data(), id.data() + id.size(), userId) };
+        if (ec != std::errc{} || ptr != id.data() + id.size() || userId <= 0)
+        {
+            Core::logError("Некорректный ID в запросе подтверждения");
+            return;
+        }
+
+        const std::string action{ callbackData.substr(8) };
+        enqueue(
+            [this, chatId, messageId, action]
+            {
                 ctx_.ui.administrator.confirmationAction(
                     chatId,
-                    action
+                    action,
+                    messageId
                 );
-			}
+            }
         );
-	}
+    }
     else if (callbackData.starts_with("more_stickers:"))
     {
         std::string data{ callbackData.substr(14) };
@@ -556,10 +922,22 @@ void CallbackHandlers::handleExternalCallback(
             return;
         }
 
-        const int stickerId{ std::stoi(data.substr(0, separatorPos)) };
-        const int startIndex{
-            std::stoi(data.substr(separatorPos + separator.size()))
-        };
+        const std::string_view idString{ data.data(), separatorPos };
+        const std::string_view indexString{ data.data() + separatorPos + separator.size(),
+            data.size() - separatorPos - separator.size() };
+        int stickerId{};
+        int startIndex{};
+        const auto [idPtr, idError]{ std::from_chars(
+            idString.data(), idString.data() + idString.size(), stickerId) };
+        const auto [indexPtr, indexError]{ std::from_chars(
+            indexString.data(), indexString.data() + indexString.size(), startIndex) };
+        if (idError != std::errc{} || idPtr != idString.data() + idString.size()
+            || indexError != std::errc{} || indexPtr != indexString.data() + indexString.size()
+            || startIndex < 0)
+        {
+            Core::logError("Некорректные данные пагинации стикеров");
+            return;
+        }
 
         // Получение пользователя
         auto user{ ctx_.users.getUser(chatId) };
@@ -571,19 +949,16 @@ void CallbackHandlers::handleExternalCallback(
             return;
         }
 
-        std::string category{};
-        ctx_.stickerDatabase.withSticker(stickerId,
-            [&category](const StickerPack& sticker)
-            {
-                category = sticker.category();
-            });
+        const auto sticker{ ctx_.stickerDatabase.stickers().getSticker(stickerId) };
+        if (!sticker) { return; }
 
         // Получение стикеров
         const std::vector<StickerPack> stickers{
-            ctx_.stickerDatabase.stickers().getStickers(category)
+            ctx_.stickerDatabase.stickers().getStickers(sticker->category())
         };
+        if (static_cast<std::size_t>(startIndex) >= stickers.size()) { return; }
 
-        ctx_.pool.addTask(
+        enqueue(
             [this, chatId, messageId, startIndex, user, stickers]
             {
                 ctx_.ui.user.messageDeletion(chatId, messageId);
@@ -636,7 +1011,7 @@ void CallbackHandlers::handleExternalCallback(
             )
         };
 
-        ctx_.pool.addTask(
+        enqueue(
             [this, chatId, messageId, result, stickerId]
             {
                 if (!result)

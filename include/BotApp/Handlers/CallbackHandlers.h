@@ -2,6 +2,7 @@
 #define CALLBACKHANDLERS_H
 
 #include <string>
+#include <string_view>
 #include <unordered_map>
 #include <functional>
 
@@ -16,6 +17,7 @@ private:
 
 	Context& ctx_;
 	std::unordered_map<std::string_view, Handler> handlers_;
+	void enqueue(std::function<void()> task);
 
 public:
 	CallbackHandlers(Context& ctx);

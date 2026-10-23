@@ -669,6 +669,8 @@ void UserUI::sendSticker(
 
 	const std::string packId{ std::to_string(sticker.id()) };
 
+	const bool isModer{ user.role() >= User::Role::Moderator };
+
 	const bool isLiked =
 		user.stickerRatings().isLike(sticker.id());
 	const bool isDisliked =
@@ -682,13 +684,27 @@ void UserUI::sendSticker(
 		std::string(isDisliked ? "✔️" : "")
 		+ "👎 " + std::to_string(sticker.dislike());
 
-	const InlineKeyboard buttons{
+	InlineKeyboard buttons{
 		{
 			{
 				{ likeText, "Like:" + packId },
 				{ dislikeText, "Dislike:" + packId }
 			}
 		}
+	};
+
+	// Добавление кнопки удаления стикерпака для модераторов
+	if (isModer)
+	{
+		static const std::string marker{ Core::separationMarker() };
+
+		buttons.addButtonRow(
+			{
+				{ "🗑️ Удалить стикерпак",
+				"confirm:remove_the_sticker_pack"
+				+ marker + packId }
+			}
+		);
 	};
 
 	if (messageId == 0)

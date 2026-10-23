@@ -101,6 +101,19 @@ public:
 
 	// Рассылка рекламы
 	void sendAdvertisementToAllUsers(int64_t chatId, int64_t messageId);
+
+	// Меню управления администраторами
+	void showAdminManagementMenu(int64_t chatId, int64_t messageId);
+
+	// Меню настройки пользователя
+	void showUserSettingsMenu(int64_t chatId, int64_t userId);
+
+	// Пользователю назначена новая роль
+	void onUserRoleAssigned(
+		int64_t chatId,
+		int64_t messageId,
+		int64_t userId
+	);
 };
 
 #endif // !ADMINISTRATOR_H

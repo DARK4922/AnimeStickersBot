@@ -74,6 +74,20 @@ void Database::createStructure()
             ");"
         );
 
+        // Счётчик ID не уменьшается после удаления стикерпаков.
+        transaction.exec(
+            "CREATE TABLE IF NOT EXISTS sticker_id_state ("
+            "id INTEGER PRIMARY KEY CHECK (id = 1),"
+            "next_id BIGINT NOT NULL CHECK (next_id BETWEEN 1 AND 2147483648)"
+            ");"
+        );
+        transaction.exec(
+            "INSERT INTO sticker_id_state (id, next_id) "
+            "SELECT 1, COALESCE(MAX(id)::BIGINT, 0) + 1 FROM stickers "
+            "ON CONFLICT (id) DO UPDATE SET "
+            "next_id = GREATEST(sticker_id_state.next_id, EXCLUDED.next_id);"
+        );
+
         // Понравившиеся стикерпаки
         transaction.exec(
             "CREATE TABLE IF NOT EXISTS user_likes ("
@@ -180,6 +194,13 @@ bool Database::saveStickers()
         const auto users{ users_.allUsers() };
 
         pqxx::work transaction{ database_ };
+
+        transaction.exec(
+            "INSERT INTO sticker_id_state (id, next_id) VALUES (1, $1) "
+            "ON CONFLICT (id) DO UPDATE SET "
+            "next_id = GREATEST(sticker_id_state.next_id, EXCLUDED.next_id);",
+            pqxx::params{ stickers_.stickers().nextId() }
+        );
 
         // Сохраняем стикерпаки
         for (const auto& sticker : stickers)
@@ -414,6 +435,14 @@ bool Database::loadStickers()
     try
     {
         pqxx::read_transaction transaction{ database_ };
+
+        const auto idState{ transaction.exec(
+            "SELECT next_id FROM sticker_id_state WHERE id = 1;"
+        ) };
+        if (!idState.empty())
+        {
+            stickers_.ensureNextId(idState[0][0].as<int64_t>());
+        }
 
         const auto result = transaction.exec(
             "SELECT "

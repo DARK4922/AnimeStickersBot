@@ -33,6 +33,25 @@ void Users::deleteUser(int64_t id)
 	if (it != users_.end()) { users_.erase(it); }
 }
 
+void Users::removeStickerRatings(int stickerId)
+{
+	std::unique_lock<std::shared_mutex> lock(usersMutex_);
+	for (auto it{ users_.begin() }; it != users_.end();)
+	{
+		if (!it->stickerRatings().isLike(stickerId)
+			&& !it->stickerRatings().isDislike(stickerId))
+		{
+			++it;
+			continue;
+		}
+
+		auto node{ users_.extract(it++) };
+		node.value().removeLike(stickerId);
+		node.value().removeDislike(stickerId);
+		users_.insert(std::move(node));
+	}
+}
+
 bool Users::doesUserExist(int64_t id) const
 {
 	std::shared_lock<std::shared_mutex> lock(usersMutex_);

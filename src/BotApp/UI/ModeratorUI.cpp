@@ -3,6 +3,7 @@
 #include "MessageText.h"
 #include "StickerDatabase.h"
 #include "Users.h"
+#include "Core.h"
 
 using ReplyKeyboard = TelegramApi::ReplyKeyboard;
 using InlineKeyboard = TelegramApi::InlineKeyboard;
@@ -14,6 +15,38 @@ ModeratorUI::ModeratorUI(
 	: tgApi_(TgApi)
 	, applications_(applications)
 {}
+
+void ModeratorUI::confirmStickerRemoval(int64_t chatId, int64_t messageId, int stickerId)
+{
+	const std::string suffix{ Core::separationMarker() + std::to_string(stickerId) };
+	const InlineKeyboard buttons{
+		{
+			{
+				{ "✅ Удалить", "remove_the_sticker_pack" + suffix },
+				{ "❌ Отмена", "cancellation_of_the_action" }
+			}
+		}
+	};
+
+	tgApi_.editMessage(
+		{
+			chatId,
+			MessageText::Moderator::confirmStickerRemoval
+		},
+		messageId,
+		{ buttons }
+	);
+}
+
+void ModeratorUI::onStickerRemoved(int64_t chatId, int64_t messageId)
+{
+	tgApi_.editMessage(
+		{
+			chatId, MessageText::Moderator::stickerRemoved
+		},
+		messageId
+	);
+}
 
 void ModeratorUI::getApplication(
 	int64_t chatId,

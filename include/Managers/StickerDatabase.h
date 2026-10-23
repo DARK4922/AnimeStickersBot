@@ -33,6 +33,8 @@ public:
 	void addCategory(std::string category);
 
 	void clearStickers();
+	bool removeSticker(int id, Users& users);
+	void ensureNextId(int64_t nextId);
 
 	const CategoryManager& categories() const;
 	const StickerPackManager& stickers() const;

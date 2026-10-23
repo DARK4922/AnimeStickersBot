@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <chrono>
 #include <mutex>
+#include <limits>
+#include <stdexcept>
 
 #include "Core.h"
 
@@ -20,7 +22,7 @@ void StickerPackManager::addSticker(StickerPack sticker)
 			return;
 		}
 
-	nextId_ = std::max(nextId_, sticker.id() + 1);
+	nextId_ = std::max(nextId_, static_cast<int64_t>(sticker.id()) + 1);
 
 	links_.insert(sticker.link());
 
@@ -54,6 +56,11 @@ void StickerPackManager::addSticker(
 		return;
 	}
 
+	if (nextId_ > std::numeric_limits<int>::max())
+	{
+		throw std::overflow_error("Sticker pack IDs exhausted");
+	}
+
 	links_.insert(link);
 
 	linksLock.unlock();
@@ -61,7 +68,7 @@ void StickerPackManager::addSticker(
 	std::vector<StickerPack>& vec{ packs_[category] };
 
 	vec.emplace_back(
-		nextId_++,
+		static_cast<int>(nextId_++),
 		std::move(category),
 		std::move(link),
 		std::chrono::system_clock::time_point{},
@@ -73,6 +80,28 @@ void StickerPackManager::addSticker(
 
 	// Сортировка этого отдела
 	std::sort(vec.begin(), vec.end());
+}
+
+bool StickerPackManager::removeSticker(int id)
+{
+	std::unique_lock<std::shared_mutex> packsLock(packsMutex_, std::defer_lock);
+	std::unique_lock<std::shared_mutex> linksLock(linksMutex_, std::defer_lock);
+	std::lock(packsLock, linksLock);
+
+	for (auto packIt{ packs_.begin() }; packIt != packs_.end(); ++packIt)
+	{
+		auto& stickers{ packIt->second };
+		const auto it{ std::find_if(stickers.begin(), stickers.end(),
+			[id](const StickerPack& sticker) { return sticker.id() == id; }) };
+		if (it == stickers.end()) { continue; }
+
+		links_.erase(it->link());
+		stickers.erase(it);
+		if (stickers.empty()) { packs_.erase(packIt); }
+		return true;
+	}
+
+	return false;
 }
 
 size_t StickerPackManager::numberSections() const
@@ -141,7 +170,23 @@ void StickerPackManager::clearStickers()
 
 	packs_.clear();
 	links_.clear();
-	nextId_ = 1;
+}
+
+int64_t StickerPackManager::nextId() const
+{
+	std::shared_lock<std::shared_mutex> lock(packsMutex_);
+	return nextId_;
+}
+
+void StickerPackManager::ensureNextId(int64_t nextId)
+{
+	if (nextId < 1 || nextId > static_cast<int64_t>(std::numeric_limits<int>::max()) + 1)
+	{
+		throw std::invalid_argument("Invalid next sticker pack ID");
+	}
+
+	std::unique_lock<std::shared_mutex> lock(packsMutex_);
+	nextId_ = std::max(nextId_, nextId);
 }
 
 std::optional<StickerPack> StickerPackManager::getSticker(int id) const

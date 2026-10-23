@@ -26,7 +26,7 @@ AdministratorUI::AdministratorUI(
 
 bool AdministratorUI::accessVerification(int64_t chatId)
 {
-	User::Role role;
+	User::Role role{};
 	users_.withUser(chatId, [&role](User& user)
 		{
 			role = user.role();
@@ -163,8 +163,13 @@ void AdministratorUI::saveStickersToFile(int64_t chatId)
 {
 	if (!accessVerification(chatId)) { return; }
 
+	const auto stickers{ stickers_.stickers().allPacks() };
+	const int64_t nextId{ stickers_.stickers().nextId() };
 	std::string status =
-		fileStorage_.saveStickers(stickers_.stickers().allPacks()) ?
+		fileStorage_.saveStickers(
+			stickers,
+			nextId
+		) ?
 		"✔ Стикеры сохранены" : "❌ Произошла ошибка";
 
 	tgApi_.sendMessage(
@@ -204,12 +209,17 @@ void AdministratorUI::updateStickersFromFile(int64_t chatId)
 
 	std::string status{ "✔ Стикеры обновлены" };
 
+	int64_t nextId{};
 	std::vector<StickerPack> stickers{
-		fileStorage_.updateStickers()
+		fileStorage_.updateStickers(nextId)
 	};
 
-	if (stickers.empty()) { status = "❌ Произошла ошибка"; }
-	else { stickers_.clearStickers(); }
+	if (nextId == 0) { status = "❌ Произошла ошибка"; }
+	else
+	{
+		stickers_.ensureNextId(nextId);
+		stickers_.clearStickers();
+	}
 
 	for (StickerPack& sticker : stickers)
 		{ stickers_.addSticker(sticker); }
@@ -623,7 +633,7 @@ void AdministratorUI::applicationDisappeared(int64_t chatId, int64_t messageId)
 		}
 	};
 
-	if (messageId != 0)
+	if (messageId == 0)
 	{
 		tgApi_.sendMessage(
 			{
@@ -648,13 +658,14 @@ void AdministratorUI::applicationDisappeared(int64_t chatId, int64_t messageId)
 
 void AdministratorUI::postPreview(int64_t chatId)
 {
-	if (!advertisementManager_.hasAdvertisement(chatId))
+	const auto advertisement{ advertisementManager_.getAdvertisement(chatId) };
+	if (!advertisement)
 	{
 		applicationDisappeared(chatId);
 		return;
 	}
 
-	advertisementManager_.getAdvertisement(chatId)->previewPost(chatId);
+	advertisement->previewPost(chatId);
 }
 
 void AdministratorUI::confirmAdvertisement(int64_t chatId, int64_t messageId)
@@ -680,6 +691,14 @@ void AdministratorUI::confirmAdvertisement(int64_t chatId, int64_t messageId)
 
 void AdministratorUI::sendAdvertisementToAllUsers(int64_t chatId, int64_t messageId)
 {
+	if (!accessVerification(chatId)) { return; }
+	const auto advertisement{ advertisementManager_.getAdvertisement(chatId) };
+	if (!advertisement)
+	{
+		applicationDisappeared(chatId, messageId);
+		return;
+	}
+
 	tgApi_.editMessage(
 		{
 			chatId,
@@ -688,6 +707,124 @@ void AdministratorUI::sendAdvertisementToAllUsers(int64_t chatId, int64_t messag
 		messageId
 	);
 
-	advertisementManager_.getAdvertisement(chatId)->broadcastAdvertisement(chatId);
+	advertisement->broadcastAdvertisement(chatId);
 	advertisementManager_.removeAdvertisement(chatId);
+}
+
+void AdministratorUI::showAdminManagementMenu(int64_t chatId, int64_t messageId)
+{
+	users_.withUser(chatId, [](User& user)
+		{
+			user.state<InputState::AdministratorState>().enteringUserId = true;
+		});
+
+	static const InlineKeyboard inlineKeyboard{
+		{
+			{
+				{ "<< Назад", "developers_menu" }
+			}
+		}
+	};
+
+	tgApi_.editMessage(
+		{
+			chatId,
+			MessageText::Administrator::showAdminManagementMenu
+		},
+		messageId,
+		{ inlineKeyboard }
+	);
+}
+
+void AdministratorUI::showUserSettingsMenu(int64_t chatId, int64_t userId)
+{
+	if (!accessVerification(chatId)) { return; }
+
+	const std::string& marker{ Core::separationMarker() };
+
+	const InlineKeyboard inlineKeyboard{
+		{
+			{
+				{ "👤 Сделать обычным пользователем",
+				"confirm:make_a_user"
+				+ marker + std::to_string(userId) }
+			},
+			{
+				{ "🛡️ Сделать модератором",
+				"confirm:make_a_moderator"
+				+ marker + std::to_string(userId) }
+			},
+			{
+				{ "👑 Сделать администратором",
+				"confirm:make_an_administrator"
+				+ marker + std::to_string(userId) }
+			}
+		}
+	};
+
+	auto user{ users_.getUser(userId) };
+	if (!user.has_value())
+	{
+		tgApi_.sendMessage(
+			{
+				chatId,
+				MessageText::Administrator::userWasNotFound(userId)
+			}
+		);
+		return;
+	}
+
+	tgApi_.sendMessage(
+		{
+			chatId,
+			MessageText::Administrator::showUserSettingsMenu(user.value())
+		},
+		{ inlineKeyboard }
+	);
+}
+
+void AdministratorUI::onUserRoleAssigned(
+	int64_t chatId,
+	int64_t messageId,
+	int64_t userId
+)
+{
+	static const InlineKeyboard inlineKeyboard{
+		{
+			{
+				{ "🏠 На главную", "developers_menu" }
+			}
+		}
+	};
+
+	auto user{ users_.getUser(userId) };
+	if (!user.has_value())
+	{
+		tgApi_.editMessage(
+			{
+				chatId,
+				MessageText::Administrator::userWasNotFound(userId)
+			},
+			messageId,
+			{ inlineKeyboard }
+		);
+		return;
+	}
+
+	// Отправка сообщения пользователю
+	tgApi_.sendMessage(
+		{
+			userId,
+			MessageText::Administrator::roleAssignmentNotification(user->role())
+		}
+	);
+
+	tgApi_.editMessage(
+		{
+			chatId,
+			MessageText::Administrator::onUserRoleAssigned(user.value())
+		},
+		messageId,
+		{ inlineKeyboard }
+	);
 }

@@ -305,17 +305,21 @@ void bot(const Config& config)
 	bot.getEvents().onCallbackQuery([&pool, &ctx, &bot, &callbackHandlers]
 	(TgBot::CallbackQuery::Ptr callback)
 		{
+			if (!callback) { return; }
+			auto callbackId{ callback->id };
+			pool.addTask([&bot, callbackId]
+				{
+					try { bot.getApi().answerCallbackQuery(callbackId); }
+					catch (const std::exception& error) { Core::logError(error.what()); }
+				});
+			// Состояние пользователя хранится по ID личного чата.
+			if (!callback->message || !callback->message->chat || !callback->from
+				|| callback->message->chat->id != callback->from->id) { return; }
 			callbackHandlers.handle(
 				callback->message->chat->id,
 				callback->message->messageId,
 				callback->data
 			);
-
-			auto callbackId{ callback->id };
-			pool.addTask([&bot, callbackId]
-				{
-					bot.getApi().answerCallbackQuery(callbackId);
-				});
 		});
 
 	// Основной цикл обработки обновлений от Telegram

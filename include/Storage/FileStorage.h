@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <cstdint>
 #include "User.h"
 #include "StickerPack.h"
 
@@ -21,11 +22,11 @@ public:
 	);
 
 	// Методы сохранения
-	bool saveStickers(const std::vector<StickerPack>& stickers) const;
+	bool saveStickers(const std::vector<StickerPack>& stickers, int64_t nextId) const;
 	bool saveUsers(const std::vector<User>& users) const;
 
 	// Методы обновления
-	std::vector<StickerPack> updateStickers() const;
+	std::vector<StickerPack> updateStickers(int64_t& nextId) const;
 	std::vector<User> updateUsers() const;
 };
 

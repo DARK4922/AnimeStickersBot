@@ -4,3 +4,13 @@
 x64/
 Debug/
 Release/
+
+# Local configuration, logs and runtime data
+/Data/
+*.db
+*.db-*
+*.sqlite
+*.sqlite-*
+*.sqlite3
+*.sqlite3-*
+*.dump

@@ -27,6 +27,7 @@ bool InputState::ModeratorState::isModeratorInputInProgress()
 void InputState::AdministratorState::resetAdministratorInputState()
 {
 	resetModeratorInputState();
+	enteringUserId = false;
 	sendingPostText = false;
 	sendingPhotoPost = false;
 }
@@ -34,6 +35,7 @@ void InputState::AdministratorState::resetAdministratorInputState()
 bool InputState::AdministratorState::isAdminInputInProgress()
 {
 	return isModeratorInputInProgress()
+		|| enteringUserId
 		|| sendingPostText
 		|| sendingPhotoPost;
 }

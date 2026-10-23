@@ -21,6 +21,7 @@ namespace InputState
 
 	struct AdministratorState : public ModeratorState
 	{
+		bool enteringUserId{};					// Ввод ID пользователя
 		bool sendingPostText{};					// Отправка текста рекламного поста
 		bool sendingPhotoPost{};				// Отправка фото рекламного поста
 		void resetAdministratorInputState();	// Сброс всех параметров ввода администратора

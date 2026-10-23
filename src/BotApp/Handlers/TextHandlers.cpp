@@ -1,5 +1,7 @@
 #include "TextHandlers.h"
 
+#include <charconv>
+
 #include "Core.h"
 #include "User.h"
 
@@ -333,12 +335,10 @@ void TextHandlers::handleStaffInput(
 					user.state<InputState::ModeratorState>().
 						enteringReasonRefusal = false;
 				}
-				else
+				else if (user.role() == User::Role::Administrator)
 				{
 					user.state<InputState::AdministratorState>().
-						sendingPostText = false;
-					user.state<InputState::AdministratorState>().
-						sendingPhotoPost = false;
+						resetAdministratorInputState();
 				}
 			});
 		return;
@@ -365,9 +365,41 @@ void TextHandlers::handleStaffInput(
 			});
 	}
 
+	// Ввод ID пользователя администратором
+	else if (user->role() == User::Role::Administrator
+		&& user->state<InputState::AdministratorState>().enteringUserId)
+	{
+		int64_t userId{};
+		const auto [end, error] = std::from_chars(
+			messageText.data(),
+			messageText.data() + messageText.size(),
+			userId
+		);
+
+		if (error != std::errc{}
+			|| end != messageText.data() + messageText.size()
+			|| userId <= 0)
+		{
+			Core::logError("Некорректный ID пользователя при вводе администратором");
+			return;
+		}
+
+		ctx.users.withUser(chatId, [](User& administrator)
+			{
+				administrator.state<InputState::AdministratorState>().enteringUserId = false;
+			});
+
+		ctx.pool.addTask([&ctx, chatId, userId]
+			{
+				if (!ctx.ui.administrator.accessVerification(chatId)) { return; }
+				ctx.ui.administrator.showUserSettingsMenu(chatId, userId);
+			});
+	}
+
 	// Ввод информации для рекламы
-	else if (user->state<InputState::AdministratorState>().sendingPostText
-		|| user->state<InputState::AdministratorState>().sendingPhotoPost)
+	else if (user->role() == User::Role::Administrator
+		&& (user->state<InputState::AdministratorState>().sendingPostText
+			|| user->state<InputState::AdministratorState>().sendingPhotoPost))
 	{
 		if (!advertisementManager.hasAdvertisement(chatId))
 		{

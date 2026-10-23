@@ -55,6 +55,18 @@ void StickerDatabase::clearStickers()
 	stickers_.clearStickers();
 }
 
+bool StickerDatabase::removeSticker(int id, Users& users)
+{
+	if (!stickers_.removeSticker(id)) { return false; }
+	users.removeStickerRatings(id);
+	return true;
+}
+
+void StickerDatabase::ensureNextId(int64_t nextId)
+{
+	stickers_.ensureNextId(nextId);
+}
+
 bool StickerDatabase::changeReaction(
     int stickerId,
     int64_t userId,
