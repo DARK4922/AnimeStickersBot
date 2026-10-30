@@ -1,6 +1,7 @@
 #include "Bot.h"
 
 #include <tgbot/tgbot.h>
+#include <tgbot/net/CurlHttpClient.h>
 
 #include "ThreadPool.h"
 #include "Users.h"
@@ -36,7 +37,7 @@ void bot(const Config& config)
 	Users users;
 	StickerDatabase stickerDatabase;
 	ApplicationManager applicationManager;
-
+	
 	// Подключение лючени к БД
 	Database database(
 		config,
@@ -46,13 +47,15 @@ void bot(const Config& config)
 	database.createStructure();
 
 	// Подключение к Telegram
-	TgBot::Bot bot(config.bot().token);
+	// Проверка сертификата и имени сервера включена в libcurl по умолчанию.
+	TgBot::CurlHttpClient httpClient;
+	TgBot::Bot bot(config.bot().token, httpClient);
 	TelegramApi api(bot);
 	if (!api.connectionStatus()) { return; }
 
 	// Создание главного админа
-	const int64_t ADMINISTRATORS_ID{ 5183420401 };
-	const std::string ADMINISTRATORS_USERNAME{ "dark_586" };
+	const int64_t ADMINISTRATORS_ID{ std::stoll(config.bot().administratorID) };
+	const std::string ADMINISTRATORS_USERNAME{ config.bot().administratorUsername };
 	if (!users.doesUserExist(ADMINISTRATORS_ID))
 		{ users.addUser(ADMINISTRATORS_ID, ADMINISTRATORS_USERNAME); }
 	users.withUser(ADMINISTRATORS_ID, [](User& user)
@@ -74,8 +77,6 @@ void bot(const Config& config)
 		advertisementManager
 	);
 
-	ThreadPool pool(6); // 6 потоков для обработки задач
-
 	UI ui
 	{
 		userUI,
@@ -83,6 +84,8 @@ void bot(const Config& config)
 		administratorUI,
 		applicationUI
 	};
+
+	ThreadPool pool(6); // 6 потоков для обработки задач
 
 	Context ctx
 	{
@@ -93,6 +96,16 @@ void bot(const Config& config)
 		ui,
 		database
 	};
+	
+	// Обработчики ответов
+	CallbackHandlers callbackHandlers(ctx);
+
+	// Объявлен после обработчиков: задачи завершаются до уничтожения их зависимостей.
+	struct PoolShutdownGuard
+	{
+		ThreadPool& pool;
+		~PoolShutdownGuard() { pool.shutdown(); }
+	} poolShutdownGuard{ pool };
 
 	// Автообновление данных
 	if (config.program().automaticDataUpdate)
@@ -116,9 +129,6 @@ void bot(const Config& config)
 		}
 	}
 	std::cout << "================================" << std::endl;
-
-	// Обработчики ответов
-	CallbackHandlers callbackHandlers(ctx);
 
 	// Обработка команд
 	// start
@@ -241,12 +251,12 @@ void bot(const Config& config)
 			if (!users.doesUserExist(message->chat->id))
 			{
 				// Создание нового пользователя
-				std::string firstName = message->from ?
-					message->from->firstName : "User";
+				std::string username = message->from ?
+					message->from->username : "";
 
 				users.addUser(
 					message->chat->id,
-					firstName
+					username
 				);
 			}
 
@@ -312,12 +322,15 @@ void bot(const Config& config)
 					try { bot.getApi().answerCallbackQuery(callbackId); }
 					catch (const std::exception& error) { Core::logError(error.what()); }
 				});
+
 			// Состояние пользователя хранится по ID личного чата.
 			if (!callback->message || !callback->message->chat || !callback->from
 				|| callback->message->chat->id != callback->from->id) { return; }
+
 			callbackHandlers.handle(
 				callback->message->chat->id,
 				callback->message->messageId,
+				callback->from->username,
 				callback->data
 			);
 		});

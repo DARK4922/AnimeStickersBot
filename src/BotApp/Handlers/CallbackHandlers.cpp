@@ -731,13 +731,15 @@ void CallbackHandlers::load()
 void CallbackHandlers::handle(
     int64_t chatId,
     int64_t messageId,
-    const std::string& callbackData)
+    const std::string& username,
+    const std::string& callbackData
+)
 {
     if (callbackData.empty() || callbackData.size() > 64 || messageId <= 0) { return; }
     // Проверка существует ли таколь пользователь
     if (!ctx_.users.doesUserExist(chatId))
     {
-        ctx_.users.addUser(chatId);
+        ctx_.users.addUser(chatId, username);
     }
 
     auto it{ handlers_.find(callbackData) };

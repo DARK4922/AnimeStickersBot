@@ -27,7 +27,9 @@ public:
 	void handle(
 		int64_t chatId,
 		int64_t messageId,
-		const std::string& callbackData);
+		const std::string& username,
+		const std::string& callbackData
+	);
 
 	// Обработка callback-запросов с сторонней информацией
 	void handleExternalCallback(

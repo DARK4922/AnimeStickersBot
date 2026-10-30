@@ -200,12 +200,6 @@ void ApplicationUI::applicationPreview(int64_t chatId, int64_t messageId)
 {
 	if (!isApplicationUpToDate(chatId, messageId)) { return; }
 
-	StickerApplication* application{};
-	users_.withUser(chatId, [&application](User& user)
-		{
-			application = user.application();
-		});
-
 	static const InlineKeyboard inlineKeyboard{
 		{
 			{
@@ -218,15 +212,25 @@ void ApplicationUI::applicationPreview(int64_t chatId, int64_t messageId)
 		}
 	};
 
-	std::vector<std::string> stickers(
-		application->links().begin(),
-		application->links().end()
-	);
+	std::string category{};
+	std::vector<std::string> stickers;
+	users_.withUser(chatId, [&](User& user)
+		{
+			auto application = user.application();
+
+			stickers = std::vector<std::string>(
+				application->links().begin(),
+				application->links().end()
+			);
+
+			category = application->category();
+		});
+
 	tgApi_.editMessage(
 		{
 			chatId,
 			MessageText::User::applicationPreview(
-				application->category(),
+				category,
 				stickers
 			)
 		},
@@ -243,17 +247,13 @@ void ApplicationUI::sendApplicationForReview(
 {
 	if (!isApplicationUpToDate(chatId, messageId)) { return; }
 
-	StickerApplication* application{};
-	users_.withUser(chatId, [&application](User& user)
-		{
-			application = user.application();
-		});
-
-	applications.addApplication(*application);
-
-	// Удаление заявки только у пользователя
 	users_.withUser(chatId, [&applications](User& user)
 		{
+			auto application{ user.application() };
+
+			applications.addApplication(*application);
+
+			// Удаление заявки только у пользователя
 			user.removeApplication();
 		});
 

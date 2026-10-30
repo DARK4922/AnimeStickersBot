@@ -25,6 +25,8 @@ file(GLOB_RECURSE BOT_SOURCES CONFIGURE_DEPENDS
 
 add_executable(StickersBot ${BOT_SOURCES})
 
+target_compile_definitions(StickersBot PRIVATE HAVE_CURL)
+
 target_include_directories(StickersBot PRIVATE
     include
     include/BotApp
@@ -40,6 +42,7 @@ target_include_directories(StickersBot PRIVATE
 
 target_link_libraries(StickersBot PRIVATE
     TgBot::TgBot
+    CURL::libcurl
     PkgConfig::PQXX
     nlohmann_json::nlohmann_json
     Threads::Threads

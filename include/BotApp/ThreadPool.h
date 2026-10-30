@@ -32,6 +32,9 @@ public:
 
 	// Добавление новой задачи
 	void addTask(ThreadPool::Task task);
+
+	// Завершает принятые задачи и ожидает потоки. Вызывать из управляющего потока.
+	void shutdown();
 };
 
 #endif // !THREADPOOL_H

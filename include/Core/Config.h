@@ -21,6 +21,7 @@ public:
 	{
 		std::string token{};
 		std::string administratorID{};
+		std::string administratorUsername{};
 	};
 
 	// Данные программы

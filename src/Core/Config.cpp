@@ -22,6 +22,7 @@ bool Config::load()
 
 		botData_.token = config.get<std::string>("bot.token");
 		botData_.administratorID = config.get<std::string>("bot.administrationId");
+		botData_.administratorUsername = config.get<std::string>("bot.administratorUsername");
 
 		programData_.version = config.get<std::string>("program.version");
 		programData_.automaticDataUpdate = config.get<bool>("program.automaticDataUpdate");

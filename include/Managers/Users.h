@@ -42,7 +42,7 @@ public:
 	template <typename Func>
 	void withUser(int64_t id, Func&& func)
 	{
-		std::shared_lock<std::shared_mutex> lock(usersMutex_);
+		std::unique_lock<std::shared_mutex> lock(usersMutex_);
 
 		// Поиск данного пользователя
 		auto it{ users_.find(User(id)) };

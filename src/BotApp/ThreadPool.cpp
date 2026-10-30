@@ -1,5 +1,7 @@
 #include "ThreadPool.h"
 
+#include "Core.h"
+
 ThreadPool::ThreadPool(size_t numberThreads)
 {
 	if (numberThreads == 0) { numberThreads = 1; }
@@ -31,13 +33,34 @@ ThreadPool::ThreadPool(size_t numberThreads)
 					}
 
 					// Выполнение задачи
-					task();
+					try
+					{
+						task();
+					}
+					catch (const std::exception& e)
+					{
+						Core::logError(
+							"Ошибка при выполнении задачи в пуле потоков: "
+							+ std::string(e.what())
+						);
+					}
+					catch (...)
+					{
+						Core::logError(
+							"Неизвестная ошибка при выполнении задачи в пуле потоков"
+						);
+					}
 				}
 			});
 	}
 }
 
 ThreadPool::~ThreadPool()
+{
+	shutdown();
+}
+
+void ThreadPool::shutdown()
 {
 	{
 		std::lock_guard<std::mutex> lock(tasksMutex_);
